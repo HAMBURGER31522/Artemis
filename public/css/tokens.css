@@ -1,0 +1,78 @@
+/* ============================================================
+   Απόλλων · 设计令牌
+   纸 / 墨 / 朱砂 —— 文学感配色 + motion-web 动效令牌
+   ============================================================ */
+
+:root {
+  /* --- 纸与墨 --- */
+  --paper: #f4eee1;          /* 页面底纸 */
+  --paper-raised: #faf5ea;   /* 卡片亮面 */
+  --paper-deep: #ebe3d0;     /* 下沉区 */
+  --ink: #1d1a13;            /* 主墨 */
+  --ink-soft: #6d6553;       /* 次级墨 */
+  --ink-faint: #a89d84;      /* 弱墨 */
+  --line: #d9cfb8;           /* 纸纹线 */
+  --line-strong: #c4b795;
+
+  --accent: #b5442a;         /* 朱砂 */
+  --accent-deep: #8f3320;
+  --accent-wash: #f0ddd2;
+
+  /* 阅读器夜间主题 */
+  --night-bg: #191712;
+  --night-ink: #d6cdb8;
+
+  /* --- 字体 --- */
+  --serif: Georgia, 'Iowan Old Style', 'Times New Roman', 'Songti SC', 'SimSun', serif;
+  --sans: system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  /* --- 尺度对比（A6：大 display 对小 body，跳差即设计） --- */
+  --fs-display: clamp(64px, 11vw, 168px);
+  --fs-h1: clamp(30px, 4.4vw, 52px);
+  --fs-h2: clamp(20px, 2.4vw, 28px);
+  --fs-body: 15px;
+  --fs-small: 12.5px;
+  --fs-tiny: 11px;
+
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 14px; --sp-4: 22px;
+  --sp-5: 34px; --sp-6: 52px; --sp-7: 84px;
+
+  --nav-h: 58px;
+  --radius: 14px;
+  --radius-sm: 8px;
+
+  /* --- Motion tokens（motion-web/motion-tokens.md） ---
+     三个层级以上，禁止"全站一个 0.3s ease" */
+  --t-instant: 90ms;
+  --t-fast: 180ms;
+  --t-standard: 320ms;
+  --t-medium: 460ms;
+  --t-slow: 700ms;
+
+  --e-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --e-in-expo: cubic-bezier(0.7, 0, 0.84, 0);
+  --e-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --e-out-circ: cubic-bezier(0, 0.55, 0.45, 1);
+  /* linear() 采样弹簧：用于小组件的"落而有重" */
+  --spring-soft: linear(0, 0.315 7.5%, 0.72 17.5%, 1.022 28%, 1.043 34%, 1.012 44%, 0.996 54%, 1);
+
+  --shadow-card: 0 1px 2px rgba(29, 26, 19, 0.08), 0 10px 28px -12px rgba(29, 26, 19, 0.22);
+  --shadow-float: 0 2px 4px rgba(29, 26, 19, 0.1), 0 24px 48px -16px rgba(29, 26, 19, 0.32);
+
+  --ease-reduce: 1; /* JS 里检测 */
+}
+
+/* 阅读器主题变量（挂 body[data-reader-theme]） */
+body[data-reader-theme='paper']   { --rd-bg: #f7f2e5; --rd-ink: #241f15; --rd-soft: #6d6553; --rd-line: #ddd3bc; }
+body[data-reader-theme='sepia']   { --rd-bg: #efe2c8; --rd-ink: #3c2f1a; --rd-soft: #7a6a4c; --rd-line: #d8c6a2; }
+body[data-reader-theme='night']   { --rd-bg: #191712; --rd-ink: #d6cdb8; --rd-soft: #8d846d; --rd-line: #35301f; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

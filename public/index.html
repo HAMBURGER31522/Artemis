@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Απόλλων · 古登堡公版书城</title>
+  <meta name="description" content="Απόλλων — 光明、诗歌与预言之神。79,000+ 部古登堡计划公版书，一键入架，即刻开读。" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f4eee1'/%3E%3Ccircle cx='16' cy='16' r='6.5' fill='none' stroke='%23b5442a' stroke-width='2.4'/%3E%3Cg stroke='%231d1a13' stroke-width='1.7' stroke-linecap='round'%3E%3Cpath d='M16 3v4M16 25v4M3 16h4M25 16h4M6.8 6.8l2.8 2.8M22.4 22.4l2.8 2.8M25.2 6.8l-2.8 2.8M9.6 22.4l-2.8 2.8'/%3E%3C/g%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="/css/tokens.css" />
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/reader.css" />
+</head>
+<body>
+
+  <!-- SVG 撕纸滤镜（手撕边缘：噪声只位移 SourceAlpha 得到撕裂形状，
+       再用 composite "in" 贴回未失真的原图 —— 内容零变形） -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <filter id="torn-a" x="-18%" y="-18%" width="136%" height="136%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.013 0.021" numOctaves="4" seed="7" result="n"/>
+        <feDisplacementMap in="SourceAlpha" in2="n" scale="20" result="tornAlpha"/>
+        <feComposite in="SourceGraphic" in2="tornAlpha" operator="in"/>
+      </filter>
+      <filter id="torn-b" x="-18%" y="-18%" width="136%" height="136%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.017 0.012" numOctaves="4" seed="31" result="n"/>
+        <feDisplacementMap in="SourceAlpha" in2="n" scale="22" result="tornAlpha"/>
+        <feComposite in="SourceGraphic" in2="tornAlpha" operator="in"/>
+      </filter>
+      <filter id="torn-c" x="-14%" y="-14%" width="128%" height="128%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.02 0.016" numOctaves="3" seed="13" result="n"/>
+        <feDisplacementMap in="SourceAlpha" in2="n" scale="13" result="tornAlpha"/>
+        <feComposite in="SourceGraphic" in2="tornAlpha" operator="in"/>
+      </filter>
+      <filter id="torn-d" x="-18%" y="-18%" width="136%" height="136%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.016 0.02" numOctaves="4" seed="23" result="n"/>
+        <feDisplacementMap in="SourceAlpha" in2="n" scale="20" result="tornAlpha"/>
+        <feComposite in="SourceGraphic" in2="tornAlpha" operator="in"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- 冷开场：裂屏滑入 —— 上下两页各载一行字，裂开露出纯拼贴 hero -->
+  <div class="cold-open" id="cold-open" aria-hidden="true">
+    <div class="half top">
+      <div class="co-kicker">ΑΠΟΛΛΩΝ</div>
+      <div class="co-line">从奥斯汀到托尔斯泰</div>
+    </div>
+    <div class="half bot">
+      <div class="co-line">欢迎你来到古登堡计划</div>
+      <div class="co-sub">79,000+ 册公版书 · 浏览器内转换 · 离线可读</div>
+    </div>
+  </div>
+
+  <!-- ===================== 顶部导航 ===================== -->
+  <nav class="nav" id="nav">
+    <div class="wrap">
+      <a class="brand" href="#/" aria-label="Απόλλων 首页">
+        <span class="logo">Απόλλων</span>
+        <span class="zh">光明 · 诗歌 · 预言</span>
+      </a>
+      <form class="nav-search" id="search-form" role="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.4-3.4"/></svg>
+        <input id="search-input" type="search" placeholder="搜书名或作者，如：Sherlock / 鲁迅 / Austen" autocomplete="off" />
+      </form>
+      <div class="nav-actions">
+        <a class="btn-shelf" href="#/shelf" id="btn-shelf" title="我的书架">
+          <span class="label">书架</span>
+          <span class="count" id="shelf-count">0</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===================== 主视图（路由挂载点） ===================== -->
+  <main id="view" aria-live="polite"></main>
+
+  <!-- ===================== 书籍详情浮层 ===================== -->
+  <div class="overlay" id="detail-overlay" role="dialog" aria-modal="true" aria-label="书籍详情">
+    <div class="panel" id="detail-panel"></div>
+  </div>
+
+  <!-- ===================== 阅读器 ===================== -->
+  <div class="reader" id="reader" data-reader-theme="paper">
+    <div class="reader-chrome">
+      <button class="rc-btn" id="rc-back" title="返回书架（Esc）">‹ 出书</button>
+      <button class="rc-btn" id="rc-toc" title="目录">目录</button>
+      <div class="rc-title" id="rc-title"></div>
+      <button class="rc-btn" id="rc-theme" title="切换纸张">纸 · 夜</button>
+      <button class="rc-btn" id="rc-settings" title="排版设置">Aa</button>
+    </div>
+
+    <div class="reader-stage">
+      <div class="pager" id="pager">
+        <div class="pager-track" id="pager-track"></div>
+        <div class="hotzone left" id="hz-left" title="上一页"></div>
+        <div class="hotzone right" id="hz-right" title="下一页"></div>
+      </div>
+      <div class="reader-foot">
+        <span class="chap" id="rf-chap"></span>
+        <div class="reader-bar"><i id="rf-bar"></i></div>
+        <span class="pct" id="rf-pct">0%</span>
+      </div>
+    </div>
+
+    <div class="reader-toc" id="reader-toc">
+      <div class="toc-head">目录 <small id="toc-count"></small></div>
+      <div class="toc-list" id="toc-list"></div>
+    </div>
+
+    <div class="reader-settings" id="reader-settings">
+      <div class="rs-group">
+        <span class="lbl">字号</span>
+        <button class="rs-btn" id="fs-minus">A−</button>
+        <button class="rs-btn" id="fs-plus">A+</button>
+      </div>
+      <div class="rs-sep"></div>
+      <div class="rs-group">
+        <span class="lbl">行距</span>
+        <button class="rs-btn" data-lh="1.7">紧</button>
+        <button class="rs-btn on" data-lh="1.85">中</button>
+        <button class="rs-btn" data-lh="2.05">疏</button>
+      </div>
+      <div class="rs-sep"></div>
+      <div class="rs-group">
+        <span class="lbl">纸张</span>
+        <button class="rs-btn on" data-theme="paper">纸</button>
+        <button class="rs-btn" data-theme="sepia">旧</button>
+        <button class="rs-btn" data-theme="night">夜</button>
+      </div>
+    </div>
+
+    <div class="reader-loading" id="reader-loading">
+      <div class="msg">
+        <div class="inkwell"></div>
+        <div class="t" id="loading-title">正在开箱这本书…</div>
+        <div class="s" id="loading-step">下载</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts"></div>
+  <div class="shelf-target" id="shelf-target"></div>
+
+  <footer class="colophon">
+    <div class="wrap">
+      <div class="row">
+        <span class="mark"><b>Α</b>πόλλων · 古登堡公版书城</span>
+      </div>
+      <p style="margin-top:10px">
+        书目与正文来自 <a href="https://www.gutenberg.org" target="_blank" rel="noopener">Project Gutenberg</a>（经 <a href="https://gutendex.com" target="_blank" rel="noopener">Gutendex</a>），均为公有领域或自由许可。
+        作者肖像（Wikimedia Commons，公有领域）：Jane Austen（Cassandra Austen 约 1810 年水彩）· Mark Twain（A.F. Bradley 摄）·
+        Edgar Allan Poe（1848 年银版照）· Charles Dickens（Gurney 摄）· 鲁迅（1930，上海，自题照）· Leo Tolstoy（Prokudin-Gorsky 1908 年彩照）·
+        Mary Shelley（Richard Rothwell 1840 年画）· Emily Dickinson（1847 年银版照）· Arthur Conan Doyle（Walter Benington 1914 年摄）。
+        下载、转换与存储全部发生在你的浏览器里。
+      </p>
+    </div>
+  </footer>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>

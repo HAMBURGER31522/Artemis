@@ -1,0 +1,204 @@
+/* ============================================================
+   Απόλλων · 阅读器
+   ============================================================ */
+.reader {
+  position: fixed; inset: 0; z-index: 70;
+  display: none;
+  background: var(--rd-bg);
+  color: var(--rd-ink);
+}
+.reader.open { display: block; }
+
+/* ---- 顶栏（阅读时自动隐藏） ---- */
+.reader-chrome {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 12;
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 10px clamp(12px, 3vw, 26px);
+  background: color-mix(in srgb, var(--rd-bg) 88%, transparent);
+  backdrop-filter: blur(9px);
+  border-bottom: 1px solid var(--rd-line);
+  transform: translateY(-110%);
+  transition: transform var(--t-standard) var(--e-out-expo);
+}
+.reader.chrome-on .reader-chrome { transform: none; }
+.reader-chrome .rc-title {
+  flex: 1; min-width: 0;
+  font-family: var(--serif); font-size: 15px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.reader-chrome .rc-title small { display: block; font-family: var(--mono); font-size: 10px; color: var(--rd-soft); letter-spacing: 0.1em; }
+.rc-btn {
+  height: 36px; min-width: 36px; padding: 0 12px;
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--rd-line); border-radius: 999px;
+  font-size: 12.5px; color: var(--rd-soft);
+  transition: color var(--t-fast), border-color var(--t-fast), transform var(--t-instant);
+}
+.rc-btn:hover { color: var(--rd-ink); border-color: var(--rd-soft); }
+.rc-btn:active { transform: scale(0.94); }
+
+/* ---- 翻页舞台 ---- */
+.reader-stage {
+  position: absolute; inset: 0;
+  display: grid; grid-template-rows: 1fr auto;
+  padding-top: 0;
+}
+.pager {
+  position: relative; overflow: hidden;
+  touch-action: pan-y;
+  cursor: grab;
+}
+.pager.dragging { cursor: grabbing; }
+.pager-track {
+  position: absolute; inset: 0;
+  will-change: transform;
+}
+/* 正文列：限制行宽（≈50rem）并居中，multi-column 沿容器向右切页 */
+.page-flow {
+  height: 100%;
+  width: min(100% - clamp(44px, 14vw, 260px), 50rem);
+  margin: 0 auto;
+  padding: clamp(58px, 9vh, 96px) 0 clamp(46px, 8vh, 80px);
+  column-width: auto;
+  column-gap: clamp(48px, 10vw, 180px);
+  column-fill: auto;
+  font-family: var(--serif);
+  font-size: var(--rd-fs, 19px);
+  line-height: var(--rd-lh, 1.85);
+  text-align: justify;
+  overflow-wrap: break-word;
+}
+.page-flow p { margin: 0 0 0.92em; text-indent: 2em; }
+.page-flow p.noindent, .page-flow h1 + p, .page-flow h2 + p, .page-flow h3 + p { text-indent: 0; }
+.page-flow h1, .page-flow h2, .page-flow h3 {
+  font-family: var(--serif); font-weight: 600;
+  line-height: 1.3; margin: 1.4em 0 0.8em;
+  break-after: avoid;
+}
+.page-flow h1 { font-size: 1.7em; } .page-flow h2 { font-size: 1.35em; } .page-flow h3 { font-size: 1.12em; }
+.page-flow blockquote {
+  margin: 1em 1.4em; padding-left: 0.9em;
+  border-left: 2px solid var(--rd-line);
+  color: var(--rd-soft); font-style: italic;
+}
+.page-flow img { max-width: 60%; max-height: 60vh; height: auto; margin: 0.8em auto; border-radius: 4px; }
+.page-flow hr { border: 0; border-top: 1px solid var(--rd-line); margin: 1.6em auto; width: 38%; }
+.page-flow em, .page-flow i { font-style: italic; }
+.page-flow .dropcap::first-letter {
+  float: left; font-size: 3.1em; line-height: 0.82;
+  padding: 0.06em 0.09em 0 0; color: var(--accent);
+  font-style: normal;
+}
+
+/* 页脚：章节名 + 页码 */
+.reader-foot {
+  position: relative; z-index: 5;
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 8px clamp(16px, 4vw, 48px) 12px;
+  font-family: var(--mono); font-size: 10.5px;
+  letter-spacing: 0.12em; color: var(--rd-soft);
+  user-select: none;
+}
+.reader-foot .chap { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.reader-foot .pct { flex: none; }
+.reader-bar {
+  flex: none; width: clamp(120px, 30vw, 380px);
+  height: 2px; background: var(--rd-line); border-radius: 2px; overflow: hidden;
+}
+.reader-bar i { display: block; height: 100%; background: var(--accent); width: 0%; }
+.reader-foot .pager-track-hint { flex: 1; text-align: right; }
+
+/* 边缘点击热区（键盘之外的鼠标翻页路径） */
+.hotzone {
+  position: absolute; top: 0; bottom: 0; width: 12%; z-index: 6;
+}
+.hotzone.left { left: 0; cursor: w-resize; }
+.hotzone.right { right: 0; cursor: e-resize; }
+
+/* ---- 设置面板（从底栏弹起） ---- */
+.reader-settings {
+  position: absolute; z-index: 14; left: 50%; bottom: 54px;
+  transform: translate(-50%, 14px);
+  display: flex; align-items: center; gap: var(--sp-4);
+  padding: 14px 22px;
+  background: color-mix(in srgb, var(--rd-bg) 94%, var(--rd-ink));
+  border: 1px solid var(--rd-line); border-radius: 16px;
+  box-shadow: var(--shadow-float);
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--t-standard) var(--e-out-expo), transform var(--t-standard) var(--spring-soft);
+}
+.reader-settings.open { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
+.rs-group { display: flex; align-items: center; gap: 8px; }
+.rs-group .lbl { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; color: var(--rd-soft); text-transform: uppercase; }
+.rs-btn {
+  min-width: 32px; height: 32px; padding: 0 10px;
+  border: 1px solid var(--rd-line); border-radius: 8px;
+  font-size: 13px; color: var(--rd-ink);
+  transition: background var(--t-fast), transform var(--t-instant);
+}
+.rs-btn:hover { background: color-mix(in srgb, var(--rd-ink) 8%, transparent); }
+.rs-btn:active { transform: scale(0.92); }
+.rs-btn.on { background: var(--rd-ink); color: var(--rd-bg); border-color: var(--rd-ink); }
+.rs-sep { width: 1px; height: 26px; background: var(--rd-line); }
+
+/* ---- 目录抽屉 ---- */
+.reader-toc {
+  position: absolute; z-index: 16; top: 0; bottom: 0; left: 0;
+  width: min(340px, 86vw);
+  background: var(--rd-bg);
+  border-right: 1px solid var(--rd-line);
+  box-shadow: var(--shadow-float);
+  transform: translateX(-102%);
+  transition: transform var(--t-medium) var(--e-out-expo);
+  display: flex; flex-direction: column;
+}
+.reader-toc.open { transform: none; }
+.reader-toc .toc-head {
+  padding: 18px 20px 12px; border-bottom: 1px solid var(--rd-line);
+  font-family: var(--serif); font-size: 17px;
+  display: flex; justify-content: space-between; align-items: baseline;
+}
+.reader-toc .toc-head small { font-family: var(--mono); font-size: 10px; color: var(--rd-soft); }
+.reader-toc .toc-list { flex: 1; overflow: auto; padding: 8px 0; }
+.toc-item {
+  display: block; width: 100%; text-align: left;
+  padding: 9px 20px;
+  font-size: 13.5px; color: var(--rd-soft);
+  border-left: 2px solid transparent;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  transition: color var(--t-fast), background var(--t-fast);
+}
+.toc-item:hover { color: var(--rd-ink); background: color-mix(in srgb, var(--rd-ink) 5%, transparent); }
+.toc-item.cur { color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+
+/* 章节切换的「纸页落下」提示层 */
+.page-turn-ghost {
+  position: absolute; inset: 0; z-index: 8; pointer-events: none;
+  background: var(--rd-bg);
+  opacity: 0;
+}
+/* 加载态：整页墨滴 */
+.reader-loading {
+  position: absolute; inset: 0; z-index: 20;
+  display: grid; place-items: center;
+  background: var(--rd-bg);
+  transition: opacity var(--t-medium) var(--e-out-expo);
+}
+.reader-loading.gone { opacity: 0; pointer-events: none; }
+.reader-loading .msg { text-align: center; }
+.reader-loading .msg .t { font-family: var(--serif); font-style: italic; font-size: 22px; }
+.reader-loading .msg .s { font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; color: var(--rd-soft); margin-top: 10px; text-transform: uppercase; }
+.reader-loading .inkwell {
+  width: 54px; height: 54px; margin: 0 auto 18px;
+  border-radius: 50%; border: 2px solid var(--rd-line);
+  border-top-color: var(--accent);
+  animation: inkspin 0.9s var(--e-in-out-quart, cubic-bezier(0.76, 0, 0.24, 1)) infinite;
+}
+@keyframes inkspin { to { transform: rotate(360deg); } }
+
+@media (max-width: 640px) {
+  .reader-settings { width: calc(100vw - 24px); flex-wrap: wrap; justify-content: center; bottom: 64px; }
+  .rs-sep { display: none; }
+  .page-flow { width: calc(100% - 40px); }
+  .page-flow { column-gap: 60px; }
+}
