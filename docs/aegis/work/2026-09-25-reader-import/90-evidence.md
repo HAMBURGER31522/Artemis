@@ -4,6 +4,8 @@
 
 当前没有实现证据。此文件只记录接手 agent 完成 slice 后的有界命令、真实样本和人工验收结果，不复制原始日志或完整 diff。
 
+已完成的接手基线证据：`npm run check` 通过（14 个文件）；`git diff --check` 通过；计划与 checkpoint 已提交为 `ef56b78` 并推送到 `origin/codex/reader-android-sync`。
+
 需要补充的终端证据：
 
 - `npm run vendor:reader`
