@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "aegis.schema.v0",
+  "requestedOutcome": "把现有 Artemis 网页封装为可以打开的 Windows 桌面应用，并保留现有网页功能。",
+  "goal": "先完成可启动的桌面壳和可重复的 exe 打包入口，为后续安卓同步保留清晰边界。",
+  "successEvidence": [
+    "npm run dist:windows 生成 NSIS 安装 exe；启动后显示 Artemis 窗口；Rust 本地服务提供 /api/health；退出时释放本地服务任务。"
+  ],
+  "stopCondition": "done：Windows 桌面应用可以启动并显示现有网页；blocked：构建依赖或系统环境无法获得；needs-verification：构建成功但安装/启动冒烟未完成；scope-exceeded：出现安卓同步、账号、云端数据库等后续范围。",
+  "nonGoals": [
+    "安卓应用与同步",
+    "账号、云端数据库和自动更新",
+    "重写前端 UI"
+  ],
+  "scope": "Tauri 2 桌面壳、Rust 本地服务、Windows 打包配置、构建和启动验证、Aegis 任务记录；保持 Android 可复用边界。",
+  "changeKinds": [
+    "distribution-surface"
+  ],
+  "riskHints": [
+    "新桌面分发边界；涉及 Tauri 主进程、Rust 本地服务、端口生命周期和打包资源。"
+  ]
+}

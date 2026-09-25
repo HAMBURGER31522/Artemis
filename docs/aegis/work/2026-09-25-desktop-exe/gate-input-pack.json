@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "aegis.schema.v0",
+  "baselineRefs": [
+    "README.md, AGENTS.md, server.mjs"
+  ],
+  "impactStatement": "docs/aegis/work/2026-09-25-desktop-exe/impact-statement-draft.json",
+  "compatPlan": "网页启动命令 node server.mjs 保持可用；Tauri 应用通过 Rust 本地随机端口承载同一 public/。",
+  "retirementPlan": "none: no legacy path removed; desktop shell is additive",
+  "evidenceBundle": [
+    "docs/aegis/work/2026-09-25-desktop-exe/evidence-bundle-draft-slice-5-source-checks.json",
+    "docs/aegis/work/2026-09-25-desktop-exe/evidence-bundle-draft-slice-5-verification.json",
+    "docs/aegis/work/2026-09-25-desktop-exe/evidence-bundle-draft-slice-5-windows-build.json"
+  ]
+}

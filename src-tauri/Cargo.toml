@@ -1,0 +1,24 @@
+[package]
+name = "artemis"
+version = "0.1.0"
+description = "Artemis public-domain bookshop and reader"
+authors = ["Artemis"]
+edition = "2021"
+rust-version = "1.77"
+
+[lib]
+name = "artemis_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.0.0", features = [] }
+
+[dependencies]
+axum = "0.8"
+mime_guess = "2"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"] }
+rust-embed = "8"
+serde = { version = "1", features = ["derive"] }
+tauri = { version = "2.0.0", features = [] }
+tokio = { version = "1", features = ["net", "sync", "time"] }
+url = "2"

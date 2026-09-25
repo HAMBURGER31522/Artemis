@@ -9,7 +9,7 @@
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(ROOT, 'public');
@@ -107,35 +107,63 @@ function handleMeta(req, res, url) {
     .catch((e) => send(res, 502, JSON.stringify({ detail: 'gutendex unreachable: ' + e.message }), { 'Content-Type': 'application/json' }));
 }
 
-const server = http.createServer((req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+export function createServer() {
+  return http.createServer((req, res) => {
+    const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
 
-  if (url.pathname === '/api/gutendex' || url.pathname.startsWith('/api/gutendex/')) {
-    return handleMeta(req, res, url);
-  }
-  if (url.pathname === '/api/content') {
-    return handleContent(req, res, url);
-  }
-  if (url.pathname === '/api/health') {
-    return send(res, 200, JSON.stringify({ ok: true, cacheMB: Math.round(contentBytes / 1048576) }), { 'Content-Type': 'application/json' });
-  }
+    if (url.pathname === '/api/gutendex' || url.pathname.startsWith('/api/gutendex/')) {
+      return handleMeta(req, res, url);
+    }
+    if (url.pathname === '/api/content') {
+      return handleContent(req, res, url);
+    }
+    if (url.pathname === '/api/health') {
+      return send(res, 200, JSON.stringify({ ok: true, cacheMB: Math.round(contentBytes / 1048576) }), { 'Content-Type': 'application/json' });
+    }
 
-  // 静态文件（含 SPA 兜底到 index.html）
-  let rel = decodeURIComponent(url.pathname).replace(/^\/+/, '');
-  let file = path.normalize(path.join(PUBLIC, rel));
-  if (!file.startsWith(PUBLIC)) return send(res, 403, 'forbidden');
-  if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) {
-    file = path.join(PUBLIC, 'index.html');
-  }
-  const ext = path.extname(file).toLowerCase();
-  const stream = fs.createReadStream(file);
-  stream.on('open', () => {
-    res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
-    stream.pipe(res);
+    // 静态文件（含 SPA 兜底到 index.html）
+    let rel = decodeURIComponent(url.pathname).replace(/^\/+/, '');
+    let file = path.normalize(path.join(PUBLIC, rel));
+    if (!file.startsWith(PUBLIC)) return send(res, 403, 'forbidden');
+    if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) {
+      file = path.join(PUBLIC, 'index.html');
+    }
+    const ext = path.extname(file).toLowerCase();
+    const stream = fs.createReadStream(file);
+    stream.on('open', () => {
+      res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
+      stream.pipe(res);
+    });
+    stream.on('error', () => send(res, 404, 'not found'));
   });
-  stream.on('error', () => send(res, 404, 'not found'));
-});
+}
 
-server.listen(PORT, () => {
-  console.log(`\n  Απόλλων · 古登堡公版书城  →  http://localhost:${PORT}\n`);
-});
+export function startServer({ host = '127.0.0.1', port = PORT } = {}) {
+  const server = createServer();
+  return new Promise((resolve, reject) => {
+    const onError = (error) => {
+      server.removeListener('listening', onListening);
+      reject(error);
+    };
+    const onListening = () => {
+      server.removeListener('error', onError);
+      const address = server.address();
+      const actualPort = typeof address === 'object' && address ? address.port : port;
+      console.log(`\n  Απόλλων · 古登堡公版书城  →  http://${host}:${actualPort}\n`);
+      resolve({ server, host, port: actualPort });
+    };
+    server.once('error', onError);
+    server.once('listening', onListening);
+    server.listen(port, host);
+  });
+}
+
+const isCliEntry = process.argv[1]
+  && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+
+if (isCliEntry) {
+  startServer().catch((error) => {
+    console.error('Unable to start Artemis server:', error);
+    process.exitCode = 1;
+  });
+}

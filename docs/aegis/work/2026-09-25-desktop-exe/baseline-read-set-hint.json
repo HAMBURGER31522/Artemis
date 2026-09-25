@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "aegis.schema.v0",
+  "candidateDocs": [
+    "README.md",
+    "AGENTS.md",
+    "server.mjs",
+    "package.json（当前缺失）"
+  ],
+  "whyRelevant": "需要新增桌面打包入口。",
+  "missingAuthority": [
+    "未定义未来账号/云同步协议；本阶段不进入该范围。"
+  ]
+}

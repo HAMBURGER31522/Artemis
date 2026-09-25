@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "aegis.schema.v0",
+  "taskId": "2026-09-25-desktop-exe",
+  "lastCheckpointRef": "docs/aegis/work/2026-09-25-desktop-exe/todo-checkpoint-draft.json",
+  "resumeInstruction": "先读本 checkpoint、plans/2026-09-25-desktop-exe.md、docs/DESKTOP-TOOLS.md，检查 release 和 git status；不要重新选择 Electron。",
+  "knownPartialWork": [
+    "读取 README、AGENTS.md 和 server.mjs",
+    "完成第一性原理审查，改用 Tauri 2 跨 Windows/Android",
+    "建立并记录 E:\\tools\\Artemis-Desktop 工具链目录",
+    "完成 Rust/Tauri 本地服务和窗口生命周期实现",
+    "npm run check、npm run smoke:server、npm run check:rust 通过",
+    "生成 NSIS 安装 exe 并完成 Artemis 窗口启动冒烟"
+  ],
+  "mustReadBeforeContinuing": [
+    "docs/aegis/work/2026-09-25-desktop-exe/10-intent.md",
+    "docs/aegis/work/2026-09-25-desktop-exe/20-checkpoint.md",
+    "docs/aegis/work/2026-09-25-desktop-exe/todo-checkpoint-draft.json"
+  ],
+  "unsafeToAssume": []
+}

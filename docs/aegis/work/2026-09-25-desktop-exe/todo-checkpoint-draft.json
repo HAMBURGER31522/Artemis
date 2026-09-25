@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "aegis.schema.v0",
+  "taskId": "2026-09-25-desktop-exe",
+  "currentTodo": "已完成 Windows 发布包整理、验证、提交和目标仓库推送",
+  "completedTodos": [
+    "读取 README、AGENTS.md 和 server.mjs",
+    "完成第一性原理审查，改用 Tauri 2 跨 Windows/Android",
+    "建立并记录 E:\\tools\\Artemis-Desktop 工具链目录",
+    "完成 Rust/Tauri 本地服务和窗口生命周期实现",
+    "npm run check、npm run smoke:server、npm run check:rust 通过",
+    "生成 NSIS 安装 exe 并完成 Artemis 窗口启动冒烟",
+    "统一 Cargo/Tauri 中间文件到 E:\\tools\\Artemis-Desktop",
+    "只保留最终安装包并推送到 HAMBURGER31522/Artemis"
+  ],
+  "activeSlice": "slice-6-checkpoint",
+  "evidenceRefs": [
+    "E:\\tools\\Artemis-Desktop\\cargo-target\\release\\bundle\\nsis\\Artemis_0.1.0_x64-setup.exe",
+    "npm run check",
+    "npm run smoke:server",
+    "npm run check:rust",
+    "npm run dist:windows",
+    "git diff --check"
+  ],
+  "blockedOn": null,
+  "nextStep": "后续从 Android 工程初始化和跨设备数据协议设计开始；不要把本阶段的浏览器 IndexedDB 直接视为同步协议。",
+  "updatedAt": "2026-09-25"
+}

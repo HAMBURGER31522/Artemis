@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "aegis.schema.v0",
+  "affectedLayers": [
+    "desktop distribution"
+  ],
+  "owners": [
+    "src-tauri/src/lib.rs + src-tauri/src/server.rs + package.json"
+  ],
+  "invariants": [
+    "现有浏览器版仍可用；服务器代理白名单和书架 IndexedDB 行为不被桌面封装改变。"
+  ],
+  "compatBoundary": "网页启动命令 node server.mjs 保持可用；Tauri 应用通过 Rust 本地随机端口承载同一 public/。",
+  "nonGoals": [
+    "安卓应用与同步",
+    "账号、云端数据库和自动更新",
+    "重写前端 UI"
+  ]
+}

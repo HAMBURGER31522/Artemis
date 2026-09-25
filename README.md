@@ -11,6 +11,23 @@ node server.mjs
 
 零 npm 依赖，只需 Node 18+（自带 fetch）。
 
+## Windows 桌面版（第一阶段）
+
+桌面版使用 Tauri 2 承载同一套 `public/` 网页，并在窗口生命周期内启动 Rust 本地服务；后续 Android 继续复用这套前端和服务边界。
+
+```powershell
+npm install
+npm run dev:desktop
+```
+
+生成 Windows 安装包 exe：
+
+```powershell
+npm run dist:windows
+```
+
+最终安装包会复制到 `release/`；Cargo/Tauri 中间产物统一写入 `E:\tools\Artemis-Desktop\cargo-target`。桌面版当前与浏览器版使用相同的书架和阅读器逻辑；安卓应用、账号和跨设备同步属于后续阶段。
+
 ## 它做什么
 
 - **裂屏冷开场**：上页载「从奥斯汀到托尔斯泰」、下页载「欢迎你来到古登堡计划」，0.55s 后上页飞速滑向右、下页滑向左，裂开露出纯拼贴 hero（作者肖像手撕纸，无文字）。

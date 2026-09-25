@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "aegis.schema.v0",
+  "taskId": "2026-09-25-desktop-exe",
+  "taskIntentRef": "docs/aegis/work/2026-09-25-desktop-exe/task-intent-draft.json",
+  "baselineRefs": [
+    "README.md, AGENTS.md, server.mjs"
+  ],
+  "scopeStatus": "aligned: Windows first slice with Android-compatible Tauri boundary",
+  "compatStatus": "preserve: node server.mjs and browser public/ remain usable; Tauri uses Rust service",
+  "retirementStatus": "none: no legacy path removed; desktop shell is additive",
+  "newRiskSignals": [
+    "Tauri/Rust 依赖和打包资源路径需要持续验证。"
+  ],
+  "decision": "continue"
+}

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "aegis.schema.v0",
+  "artifactKey": "source-checks",
+  "type": "command",
+  "source": "npm run check; npm run smoke:server; npm run check:rust",
+  "summary": "JavaScript syntax, existing Node server health smoke, and Rust/Tauri compilation all passed.",
+  "verifier": "Codex",
+  "sliceId": "slice-5-source-checks",
+  "evidenceStatus": "evidence-finalized",
+  "updatedAt": "2026-09-25"
+}

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "aegis.schema.v0",
+  "artifactKey": "windows-build",
+  "type": "artifact",
+  "source": "E:/tools/Artemis-Desktop/cargo-target/release/bundle/nsis/Artemis_0.1.0_x64-setup.exe",
+  "summary": "Tauri generated the x64 NSIS installer successfully.",
+  "verifier": "Codex",
+  "sliceId": "slice-5-windows-build",
+  "evidenceStatus": "evidence-finalized",
+  "updatedAt": "2026-09-25"
+}

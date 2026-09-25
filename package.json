@@ -1,0 +1,20 @@
+{
+  "name": "artemis",
+  "productName": "Artemis",
+  "version": "0.1.0",
+  "description": "A public-domain bookshop and reader for browser, Windows, and Android.",
+  "private": true,
+  "scripts": {
+    "start": "node server.mjs",
+    "dev:desktop": "node scripts/run-tauri.mjs dev",
+    "check": "node scripts/check-syntax.mjs",
+    "check:rust": "node scripts/run-cargo.mjs check --manifest-path src-tauri/Cargo.toml",
+    "smoke:server": "node scripts/smoke-server.mjs",
+    "dist:windows": "node scripts/run-tauri.mjs build --bundles nsis",
+    "dist": "node scripts/run-tauri.mjs build --bundles nsis,msi"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.11.5",
+    "@tauri-apps/api": "2.11.1"
+  }
+}
