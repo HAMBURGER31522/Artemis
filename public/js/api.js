@@ -19,13 +19,13 @@ async function fetchBooksOnce({ page = 1, search = '', topic = '', languages = '
   if (topic) q.set('topic', topic);
   if (languages) q.set('languages', languages);
   if (sort && sort !== 'popular') q.set('sort', sort);
-  const r = await fetch('/api/gutendex/books?' + q.toString());
+  const r = await fetch('/api/gutendex/books/?' + q.toString());
   if (!r.ok) throw new Error('gutendex ' + r.status);
   return r.json();
 }
 
 export async function fetchBook(id) {
-  const r = await fetch('/api/gutendex/books/' + id);
+  const r = await fetch('/api/gutendex/books/' + id + '/?');
   if (!r.ok) throw new Error('book ' + id + ' not found');
   return r.json();
 }

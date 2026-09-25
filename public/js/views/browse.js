@@ -238,6 +238,7 @@ async function loadMore(root) {
     });
     state.next = j.next; state.page++; state.count = j.count;
     const grid = root.querySelector('#grid');
+    state.feed.push(...j.results);
     grid.insertAdjacentHTML('beforeend', j.results.map((b) => cardHTML(b, { onshelf: !!peekProgress(b.id) })).join(''));
     enhanceCards(grid);
     root.querySelector('#grid-count').textContent = `共 ${j.count.toLocaleString()} 本 · ${filterNote()}`;
@@ -282,7 +283,11 @@ function bindEvents(root) {
 
 function onRootClick(e) {
   const card = e.target.closest('[data-book]');
-  if (card) { openDetail(Number(card.dataset.book), card); return; }
+  if (card) {
+    const id = Number(card.dataset.book);
+    openDetail(id, card, state.feed.find((book) => book.id === id));
+    return;
+  }
   const lang = e.target.closest('[data-lang]');
   if (lang) { reloadGrid(viewRoot(), { lang: lang.dataset.lang }); return; }
   const topic = e.target.closest('[data-topic]');

@@ -7,6 +7,7 @@
  * 运行: node server.mjs  →  http://localhost:3311
  */
 import http from 'node:http';
+import https from 'node:https';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -58,15 +59,56 @@ function send(res, status, body, headers = {}) {
   res.end(body);
 }
 
-const UA = { 'User-Agent': 'Apollon/1.0 (personal reader)', connection: 'close' };
+const UA = {
+  'User-Agent': 'Artemis/1.0 (personal reader)',
+  Accept: 'application/json, text/plain, */*',
+  connection: 'close',
+};
+
+function requestUpstream(url, timeoutMs, redirects = 0) {
+  return new Promise((resolve, reject) => {
+    const request = https.get(url, { headers: UA }, (upstreamResponse) => {
+      const status = upstreamResponse.statusCode || 502;
+      const location = upstreamResponse.headers.location;
+      if (status >= 300 && status < 400 && location) {
+        upstreamResponse.resume();
+        if (redirects >= 5) {
+          reject(new Error('too many upstream redirects'));
+          return;
+        }
+        requestUpstream(new URL(location, url).href, timeoutMs, redirects + 1).then(resolve, reject);
+        return;
+      }
+
+      const chunks = [];
+      upstreamResponse.on('data', (chunk) => chunks.push(chunk));
+      upstreamResponse.on('end', () => {
+        const body = Buffer.concat(chunks);
+        resolve({
+          ok: status >= 200 && status < 300,
+          status,
+          headers: {
+            get(name) {
+              const value = upstreamResponse.headers[name.toLowerCase()];
+              return Array.isArray(value) ? value[0] || null : value || null;
+            },
+          },
+          text: async () => body.toString('utf8'),
+          arrayBuffer: async () => body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength),
+        });
+      });
+    });
+    request.setTimeout(timeoutMs, () => request.destroy(new Error('upstream request timed out')));
+    request.on('error', reject);
+  });
+}
 
 async function upstream(url, timeoutMs = 30000) {
-  // connection: close 规避 keep-alive 连接被远端关闭后复用失败的问题
+  // native https 规避 undici TLS 指纹被上游挑战；仍保留一次有限重试。
   try {
-    return await fetch(url, { headers: UA, redirect: 'follow', signal: AbortSignal.timeout(timeoutMs) });
+    return await requestUpstream(url, timeoutMs);
   } catch (e) {
-    // 一次重试（瞬时网络抖动 / 半关闭连接）
-    return await fetch(url, { headers: UA, redirect: 'follow', signal: AbortSignal.timeout(timeoutMs) });
+    return requestUpstream(url, timeoutMs);
   }
 }
 
@@ -98,7 +140,7 @@ function handleMeta(req, res, url) {
   if (cached && Date.now() - cached.t < META_TTL) {
     return send(res, 200, cached.body, { 'Content-Type': 'application/json; charset=utf-8', 'X-Cache': 'hit' });
   }
-  upstream('https://gutendex.com' + sub + url.search)
+  upstream('https://gutendex.com' + sub + (url.search || '?'))
     .then(async (r) => {
       const body = await r.text();
       if (r.ok) metaCache.set(key, { t: Date.now(), body });

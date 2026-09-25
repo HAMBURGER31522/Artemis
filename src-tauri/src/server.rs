@@ -116,6 +116,7 @@ async fn upstream(client: &Client, target: &str, timeout: Duration) -> Result<re
             .get(target)
             .timeout(timeout)
             .header("User-Agent", "Artemis/1.0 (personal reader)")
+            .header("Accept", "application/json, text/plain, */*")
             .header("Connection", "close")
             .send()
     };
@@ -140,7 +141,10 @@ async fn meta(State(state): State<AppState>, uri: Uri) -> Response {
         .strip_prefix("/api/gutendex")
         .filter(|path| !path.is_empty() && *path != "/")
         .unwrap_or("/books");
-    let query = uri.query().map(|value| format!("?{value}")).unwrap_or_default();
+    let query = uri
+        .query()
+        .map(|value| format!("?{value}"))
+        .unwrap_or_else(|| "?".to_string());
     let target = format!("https://gutendex.com{suffix}{query}");
 
     if let Some((body, content_type)) = state.meta_cache.lock().await.get(&target) {

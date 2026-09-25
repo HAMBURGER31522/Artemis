@@ -21,6 +21,16 @@
 - Verifier: Codex
 - Evidence status: evidence-finalized
 
+## EvidenceBundleDraft: slice-7-repair
+
+- Artifact key: desktop-repair
+- Slice ID: slice-7-repair
+- Type: regression-and-artifact
+- Source: `public/js/app.js`, `public/js/api.js`, `public/js/views/browse.js`, `public/js/views/detail.js`, `server.mjs`, `src-tauri/src/main.rs`, `src-tauri/src/server.rs`; `npm run dist:windows`
+- Summary: Search submission is captured before the initial asynchronous route finishes, API requests use normalized Gutendex paths and native upstream transport, book cards reuse prefetched metadata, and the release binary uses the Windows GUI subsystem. Rebuilt desktop endpoints returned 200 for health, popular books, search, and Gutenberg HTML content.
+- Verifier: Codex
+- Evidence status: evidence-finalized
+
 ## EvidenceBundleDraft: slice-5-source-checks
 
 - Artifact key: source-checks

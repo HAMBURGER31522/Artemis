@@ -16,12 +16,12 @@ const panel = () => document.getElementById('detail-panel');
 let current = null;      // { id, meta, sourceEl }
 let exiting = false;     // 出匣动画进行中，阻止重复点击
 
-export async function openDetail(id, sourceEl) {
+export async function openDetail(id, sourceEl, prefetchedMeta = null) {
   exiting = false;
   overlay().classList.add('open');
   panel().innerHTML = `<div style="position:absolute;inset:0;display:grid;place-items:center;color:var(--paper);font-family:var(--serif);font-style:italic;font-size:18px">取书去了…</div>`;
   try {
-    const meta = await fetchBook(id);
+    const meta = prefetchedMeta || await fetchBook(id);
     current = { id, meta, sourceEl };
     if (overlay().classList.contains('open')) render(meta);
   } catch (e) {

@@ -44,6 +44,7 @@
 - [x] `slice-4-packaging`：配置 Tauri Windows 打包和后续 Android 生成入口，保留 Node 浏览器开发脚本。
 - [x] `slice-5-verification`：安装依赖，运行 JS/Rust 检查，生成 NSIS `.exe`，做启动/关闭冒烟检查。
 - [x] `slice-6-checkpoint`：更新进度条、证据包、漂移状态，提交必要文件并推送目标仓库。
+- [x] `slice-7-repair`：修复启动期 Enter 刷新、Gutendex 代理请求、详情重复请求和 Windows 发布版控制台窗口。
 
 ## 兼容和退役
 
@@ -61,10 +62,11 @@ npm run check:rust
 npm run dist:windows
 ```
 
-已完成验证：`npm run check`、`npm run smoke:server`、`npm run check:rust`、`npm run dist:windows`；打包产物 `Artemis_0.1.0_x64-setup.exe` 已生成，直接启动编译产物时窗口标题为 `Artemis`，进程可保持并可结束。未覆盖安装器实际安装流程、安卓同步和跨设备数据一致性。
+已完成验证：`npm run check`、`npm run smoke:server`、`npm run check:rust`、`npm run dist:windows`；新桌面服务的榜单、搜索和 Gutenberg 正文代理均返回 200，发布版 PE subsystem 为 Windows GUI，直接启动编译产物时窗口标题为 `Artemis`，进程可保持并可结束。未覆盖安装器实际安装流程、安卓同步和跨设备数据一致性。
 
 ## 风险
 
 - Rust/Tauri 下载和构建依赖较大，首次安装可能受网络或镜像影响。
 - Windows 打包产物能生成不等于用户环境上的安装和网络访问都已验证。
 - 当前页面依赖外部 Gutendex/Gutenberg 网络，桌面壳不会消除该依赖。
+- Gutendex 仍可能按网络出口触发 Cloudflare 挑战；桌面服务已使用 Rust reqwest、有限重试和尾斜杠/空查询规范降低误判，但无法替代上游可用性。

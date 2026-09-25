@@ -14,11 +14,15 @@
 - npm run check、npm run smoke:server、npm run check:rust 通过
 - 生成 NSIS 安装 exe 并完成 Artemis 窗口启动冒烟
 - 仅复制最终安装包到项目 `release/`
+- 修复启动期 Enter 触发表单刷新、统一 Gutendex 代理请求、复用列表元数据并隐藏发布版控制台
 - Evidence refs:
 - E:\tools\Artemis-Desktop\cargo-target\release\bundle\nsis\Artemis_0.1.0_x64-setup.exe
 - npm run check
 - npm run smoke:server
 - npm run check:rust
+- npm run dist:windows
+- desktop API: `/api/health`、榜单、搜索、Gutenberg 正文代理均返回 200
+- release PE subsystem: Windows GUI
 - Resume order: 先读本 checkpoint、`docs/aegis/plans/2026-09-25-desktop-exe.md`、`docs/DESKTOP-TOOLS.md`，检查 `release/` 和 `git status`；不要重新选择 Electron。
 - Blocked on: none
 - Next step: 后续任务从 Android 工程初始化和跨设备数据协议设计开始；不要把本阶段的浏览器 IndexedDB 直接视为同步协议。

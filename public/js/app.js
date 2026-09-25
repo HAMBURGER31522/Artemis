@@ -14,6 +14,7 @@ import { bump, REDUCED } from './motion.js';
 const view = document.getElementById('view');
 let currentView = null;
 let pendingSearch = ''; // 从书架等视图发起搜索时暂存
+let appReady = false;
 
 /* ---------- 冷开场：撕开封纸（首次加载；reduced-motion 直接跳过） ---------- */
 function playColdOpen() {
@@ -62,8 +63,9 @@ async function renderBase(hash) {
     await mountShelf(view);
   } else {
     currentView = 'browse';
-    await mountBrowse(view, { reset: true, search: pendingSearch });
+    const search = pendingSearch;
     pendingSearch = '';
+    await mountBrowse(view, { reset: true, search });
     window.scrollTo(0, 0);
   }
 }
@@ -73,6 +75,28 @@ function closeReaderSilent() {
   import('./views/reader.js').then((m) => m.closeReader());
 }
 
+/* ---------- 搜索（必须先于首屏异步加载绑定） ---------- */
+async function submitSearch(e) {
+  e.preventDefault();
+  const q = document.getElementById('search-input').value.trim();
+  if (!q) return;
+
+  // 首屏还在取书时也要拦截 Enter；等首屏结束后再消费这次搜索。
+  pendingSearch = q;
+  if (!appReady) return;
+
+  if (location.hash !== '#/' && location.hash !== '') {
+    location.hash = '#/';
+    return;
+  }
+
+  pendingSearch = '';
+  await mountBrowse(view, { reset: true, search: q });
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('search-form').addEventListener('submit', submitSearch);
+
 /* ---------- 启动 ---------- */
 bindDetailGlobal();
 await loadProgressIndex().catch(() => {});
@@ -80,6 +104,20 @@ await updateBadge();
 
 window.addEventListener('hashchange', route);
 await route();
+appReady = true;
+
+// 用户可能在首屏请求尚未结束时已经提交搜索，首屏完成后补跑一次。
+if (pendingSearch) {
+  const q = pendingSearch;
+  pendingSearch = '';
+  if (location.hash !== '#/' && location.hash !== '') {
+    pendingSearch = q;
+    location.hash = '#/';
+  } else {
+    await mountBrowse(view, { reset: true, search: q });
+    window.scrollTo(0, 0);
+  }
+}
 
 /* 书架变化 → 徽标 */
 document.addEventListener('shelf-changed', async () => {
@@ -90,17 +128,4 @@ document.addEventListener('shelf-changed', async () => {
     bump(document.getElementById('shelf-count'));
   }
   if (currentView === 'shelf') mountShelf(view);
-});
-
-/* 搜索 */
-document.getElementById('search-form').addEventListener('submit', (e) => {
-  e.preventDefault();
-  const q = document.getElementById('search-input').value.trim();
-  if (!q) return;
-  if (location.hash === '#/' || location.hash === '') {
-    if (currentView === 'browse') mountBrowse(view, { reset: true, search: q });
-  } else {
-    pendingSearch = q;
-    location.hash = '#/';
-  }
 });

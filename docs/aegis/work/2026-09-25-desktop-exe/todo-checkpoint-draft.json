@@ -10,16 +10,19 @@
     "npm run check、npm run smoke:server、npm run check:rust 通过",
     "生成 NSIS 安装 exe 并完成 Artemis 窗口启动冒烟",
     "统一 Cargo/Tauri 中间文件到 E:\\tools\\Artemis-Desktop",
-    "只保留最终安装包并推送到 HAMBURGER31522/Artemis"
+    "只保留最终安装包并推送到 HAMBURGER31522/Artemis",
+    "修复启动期搜索刷新、Gutendex 代理、书籍详情重复请求和发布版控制台窗口"
   ],
-  "activeSlice": "slice-6-checkpoint",
+  "activeSlice": "slice-7-repair",
   "evidenceRefs": [
     "E:\\tools\\Artemis-Desktop\\cargo-target\\release\\bundle\\nsis\\Artemis_0.1.0_x64-setup.exe",
     "npm run check",
     "npm run smoke:server",
     "npm run check:rust",
     "npm run dist:windows",
-    "git diff --check"
+    "git diff --check",
+    "desktop API health/list/search/content endpoints returned 200",
+    "release PE subsystem is Windows GUI"
   ],
   "blockedOn": null,
   "nextStep": "后续从 Android 工程初始化和跨设备数据协议设计开始；不要把本阶段的浏览器 IndexedDB 直接视为同步协议。",
