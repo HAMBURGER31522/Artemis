@@ -22,3 +22,7 @@ Entries are workspace records, not authoritative runtime decisions.
 | 2026-09-25 | artifact | docs/aegis/work/2026-09-25-desktop-exe/gate-input-pack.json | 2026-09-25-desktop-exe gate input pack |
 | 2026-09-25 | work | docs/aegis/work/2026-09-25-desktop-exe/proof-bundle.md | 2026-09-25-desktop-exe proof bundle |
 | 2026-09-25 | plan | docs/aegis/plans/2026-09-25-desktop-exe.md | Artemis Windows 桌面应用第一阶段实施计划 |
+| 2026-09-25 | plan | docs/aegis/plans/2026-09-25-reader-import.md | Artemis 本地书籍导入、Android 应用与跨设备同步 |
+| 2026-09-25 | work | docs/aegis/work/2026-09-25-reader-import/10-intent.md | 本地书籍导入与阅读器 intent |
+| 2026-09-25 | work | docs/aegis/work/2026-09-25-reader-import/20-checkpoint.md | 本地书籍导入与阅读器 checkpoint |
+| 2026-09-25 | work | docs/aegis/work/2026-09-25-reader-import/90-evidence.md | 本地书籍导入与阅读器 evidence |

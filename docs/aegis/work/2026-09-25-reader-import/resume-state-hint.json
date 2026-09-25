@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "aegis.schema.v0",
+  "taskId": "2026-09-25-reader-import",
+  "planRef": "docs/aegis/plans/2026-09-25-reader-import.md",
+  "lastCheckpointRef": "docs/aegis/work/2026-09-25-reader-import/20-checkpoint.md",
+  "resumeInstruction": "先读 intent、checkpoint、plan 和 AGENTS.md，比较当前 HEAD/diff；阅读 Koodo 参考副本/链接及计划第 0 节指定文件；从第一个未完成 slice 继续，不复制 E:\\epub 样本，不提交中间产物。",
+  "knownPartialWork": [
+    "设计和实施计划已写入，业务代码尚未开始",
+    "本地阅读器计划已扩展为 Android 与 Google Drive 双向同步范围",
+    "Koodo 参考副本已存在于 E:\\tools\\Artemis-Desktop\\references\\koodo-reader"
+  ],
+  "mustReadBeforeContinuing": [
+    "docs/aegis/work/2026-09-25-reader-import/10-intent.md",
+    "docs/aegis/work/2026-09-25-reader-import/20-checkpoint.md",
+    "docs/aegis/plans/2026-09-25-reader-import.md",
+    "AGENTS.md",
+    "E:\\tools\\Artemis-Desktop\\references\\koodo-reader\\src\\components\\importLocal\\component.tsx",
+    "E:\\tools\\Artemis-Desktop\\references\\koodo-reader\\src\\pages\\reader\\component.tsx",
+    "E:\\tools\\Artemis-Desktop\\references\\koodo-reader\\src\\utils\\storage\\syncService.ts"
+  ],
+  "unsafeToAssume": [
+    "PDF.js worker 资源路径已经正确",
+    "IndexedDB 可以无条件保存超过 200MB 的 PDF",
+    "旧 reader 分页在窄窗口已经可读",
+    "Google OAuth client ID、Drive appDataFolder 权限和 token 安全存储已经可用",
+    "Android SDK/NDK/JDK、真机/模拟器和二维码/安全存储插件已经可用"
+  ]
+}
